@@ -2,5 +2,6 @@ import boletocr
 
 file = open('boleto.pdf', 'rb')
 
-boletocr.readBoleto(file)
+response = boletocr.readBoleto(file)
+print(response)
 
