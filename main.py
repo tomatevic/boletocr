@@ -1,14 +1,14 @@
 import boletocr
+import os
+import time
 
-file = open('imagem.png', 'rb')
-response = boletocr.readBoleto(file)
-print(response)
 
-file2 = open('invalidPDF.pdf', 'rb')
-response = boletocr.readBoleto(file2)
-print(response)
-
-file3 = open('boleto.pdf', 'rb')
-response = boletocr.readBoleto(file3)
-print(response)
+for filename in os.listdir(os.path.join(os.getcwd(), "arquivos")):
+    print("--- Iniciando execução: %s ---" % filename)
+    tempo = time.time()
+    with open(os.path.join(os.getcwd(), "arquivos", filename), 'rb') as f:
+        response = boletocr.readBoleto(f)
+        print(response)
+        print("--- Executado em %s segundos ---" % (time.time() - tempo))
+        print()
 
