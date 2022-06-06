@@ -1,6 +1,4 @@
 from typing import BinaryIO
-
-
 import boto3
 import variables
 import pdf2image
@@ -8,7 +6,6 @@ import json
 import re
 
 textract = boto3.client('textract', region_name="us-east-1")
-
 
 class Boleto:
     agenciaCodigoBeneficiario: str
@@ -41,9 +38,11 @@ class Boletocr:
 def readBoleto(file: BinaryIO):
     response = Boletocr()
     try:
+        # Validação do documento e possível retorno do codigo
         codigo = __validateDocumentAndReturnCodigo(file)
-        __pdfToImage(file)
+        # Chamada do Textract
         textractresponse = __callTextract()
+        # Filtragem da resposta do Textract
         boletoresponse = __filterResponse(textractresponse)
         boletoresponse.codigo = codigo
 
@@ -57,6 +56,9 @@ def readBoleto(file: BinaryIO):
 def __validateDocumentAndReturnCodigo(file: BinaryIO):
     if not file.name.endswith('.pdf'):
         raise Exception('Formato de arquivo precisa ser em PDF.')
+
+    # Conversão do pdf para imagem
+    __pdfToImage(file)
 
     with open(variables.imgboleto, 'rb') as image:
         response = textract.detect_document_text(
@@ -74,11 +76,10 @@ def __validateDocumentAndReturnCodigo(file: BinaryIO):
 
     raise Exception("O arquivo precisa ser um boleto")
 
+
 def __pdfToImage(file: BinaryIO):
     image = pdf2image.convert_from_bytes(file.read(), poppler_path=variables.poppler)
-
     image[0].save(variables.imgboleto, 'JPEG')
-
 
 
 def __callTextract():
